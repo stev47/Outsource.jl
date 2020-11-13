@@ -1,0 +1,4 @@
+name = "Outsource"
+uuid = "ce4b2b2b-baef-434e-9229-2c3161aca78b"
+authors = ["Stephan Hilb <stephan@ecshi.net>"]
+version = "0.1.0"

@@ -8,19 +8,20 @@ using Outsource: Connector, outsource
 
     @test isopen(con) && isopen(rcon)
 
+    # input
     x = rand()
     res = @async put!(con, x)
     @test take!(rcon) == x
     @test fetch(res) === con
 
+    # output
     y = rand()
     res = @async put!(rcon, y)
     @test take!(con) == y
     @test fetch(res) === rcon
 
     @test isnothing(close(con))
-    @test !isopen(con)
-    @test !isopen(rcon)
+    @test !isopen(con) && !isopen(rcon)
 end
 
 @testset "outsource" begin
@@ -38,7 +39,7 @@ end
 #
 #
 #
-#workerchannel = outsource(workerid, T => S) do con
+#workerchannel = outsource(workerid, T, S) do con
 #    state = initialize(param)
 #    while isopen(con)
 #        in = take!(con)::T

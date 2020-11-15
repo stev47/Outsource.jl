@@ -4,7 +4,7 @@ export outsource
 
 include("connector.jl")
 
-using Distributed: remote_do, workers, myid
+using Distributed: remote_do, workers, myid, remotecall_eval
 
 """
     outsource(f, id)
@@ -25,6 +25,10 @@ function outsource(f, id, ::Type{T}, ::Type{S}) where {T,S}
 
     con = Connector{S, T}()
     rcon = reverse(con)
+
+    # hack to ensure `f` is defined remotely
+    # otherwise we get an uncatchable exception that gets hidden
+    remotecall_eval(Main, id, f)
     remote_do(id) do
         try
             f(rcon)

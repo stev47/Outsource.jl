@@ -1,6 +1,13 @@
 using Test
 
+using Distributed
+addprocs(1)
+
+using Logging: NullLogger, with_logger
+silence(f) = with_logger(f, NullLogger())
+
 using Outsource: Connector, outsource
+
 
 @testset "Connector" begin
     con = Connector()
@@ -24,8 +31,14 @@ using Outsource: Connector, outsource
     @test !isopen(con) && !isopen(rcon)
 end
 
+f() = nothing
 @testset "outsource" begin
-    # TODO: test error handling
+    silence() do
+        con = outsource(_ -> nothing, 1)
+        @test isa(con, Connector)
+    end
+    @test_throws Exception outsource(f, 2)
+    # TODO: test async remote error handling
 end
 
 

@@ -40,23 +40,3 @@ f() = nothing
     @test_throws Exception outsource(f, 2)
     # TODO: test async remote error handling
 end
-
-
-
-
-
-#
-#initialize(param) = rand(1000, 1000) .+ param
-#process!(state, in) = state .+= svd(state .+ in).V
-#
-#
-#
-#
-#workerchannel = outsource(workerid, T, S) do con
-#    state = initialize(param)
-#    while isopen(con)
-#        in = take!(con)::T
-#        out = process!(state, in)
-#        put!(con, out::S)
-#    end
-#end

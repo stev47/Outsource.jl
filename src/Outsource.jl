@@ -21,7 +21,8 @@ Exceptions thrown in `f` are logged as errors in the current task.
 outsource(f, id = rand(workers())) = outsource(f, id, Any, Any)
 function outsource(f, id, ::Type{T}, ::Type{S}) where {T,S}
     myid() == 1 || @error("need to be called from pid 1")
-    id != myid() || @warn("outsourcing to task on same process")
+    id != myid() || @warn("outsourcing to task on same process" *
+        " (no parallel execution)", maxlog = 1)
 
     con = Connector{S, T}()
     rcon = reverse(con)

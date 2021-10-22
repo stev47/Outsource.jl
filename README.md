@@ -11,8 +11,7 @@ distributed computing environment.
 
 ```julia
 using Distributed; addprocs(1)
-
-using Outsource
+@everywhere using Outsource
 
 # spawn to worker id 2
 wc = outsource(2) do c

@@ -40,7 +40,7 @@ function outsource(f, id, ::Type{T}, ::Type{S}) where {T,S}
             # TODO: prune serialization stuff from stacktrace
             @error(
                 "outsourced task failed",
-               exception = (e, catch_backtrace()))
+                exception = (e, catch_backtrace()))
         finally
             close(rcon)
         end

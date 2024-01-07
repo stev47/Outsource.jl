@@ -4,7 +4,7 @@ export outsource
 
 include("connector.jl")
 
-using Distributed: remote_do, workers, myid, remotecall_eval
+using Distributed: RemoteException, extract_exception, remote_do, workers, myid, remotecall_eval
 
 """
     outsource(f, id)
@@ -33,16 +33,24 @@ function outsource(f, id, ::Type{T}, ::Type{S}) where {T,S}
     remote_do(id) do
         try
             f(rcon)
-        catch e
-            # TODO: for non-shared stdout, exceptions need to be
-            #       communicated back. Maybe introduce a global pid1
-            #       remote-channel for that
-            # TODO: prune serialization stuff from stacktrace
-            @error(
-                "outsourced task failed",
-                exception = (e, catch_backtrace()))
+        catch remote_e
+            if remote_e isa RemoteException
+                e = extract_exception(remote_e)
+                if e isa InvalidStateException && e.state == :closed
+                    @debug "Connector was closed: outsourced task will terminate."
+                else
+                    # TODO: for non-shared stdout, exceptions need to be
+                    #       communicated back. Maybe introduce a global pid1
+                    #       remote-channel for that
+                    # TODO: prune serialization stuff from stacktrace
+                    error("Outsourced task on worker `$(e.pid)` failed")
+                end
+            else
+                rethrow(remote_e)
+            end
         finally
             close(rcon)
+            GC.gc()
         end
     end
     return con
